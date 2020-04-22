@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	SERVER_HOST       = "192.168.0.143"
+	SERVER_HOST       = "192.168.8.101"
 	SERVER_PORT       = 6062
 	USER              = "chain"
 	PASSWD            = "999000"
@@ -19,9 +19,9 @@ func makeReqJson(arg ...interface{}) string {
 	var stuReqJson rpcRequest
 
 	stuReqJson.JsonRpc = "1.0"
-	stuReqJson.Id = 1
-	stuReqJson.Method = arg[0].(string)
-	stuReqJson.Params = arg[1:]
+	stuReqJson.Id = arg[0].(string)
+	stuReqJson.Method = arg[1].(string)
+	stuReqJson.Params = arg[2:]
 
 	// fmt.Println("stuReqJson.Method=", stuReqJson.Method)
 	// fmt.Println("stuReqJson.Params=", stuReqJson.Params)
@@ -30,15 +30,60 @@ func makeReqJson(arg ...interface{}) string {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println("reqJson=", string(reqJson))
+	fmt.Println(stuReqJson.Method, "reqJson=", string(reqJson))
 	return string(reqJson)
 }
 
-func decodeJson(distData interface{}) {
-	fmt.Println("distData=", distData)
-	var resultInfo interface{}
-	json.Unmarshal(distData.([]byte), &resultInfo)
-	// fmt.Println("resultInfo=", resultInfo)
+func decodeJson(resultInfo string) rpcResponse {
+	var rpcresponse rpcResponse
+	err := json.Unmarshal([]byte(resultInfo), &rpcresponse)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("rpcresponse.Err=", rpcresponse.Err)
+	fmt.Println("rpcresponse.Id=", rpcresponse.Id)
+	fmt.Println("rpcresponse.Result=", string(rpcresponse.Result))
+	return rpcresponse
+}
+
+func selectCommand(rpcresponse *rpcResponse) interface{} {
+	if rpcresponse.Id == "listunspent" {
+		strTxouts := parseListunspent(rpcresponse.Result)
+		return strTxouts
+	}
+	return nil
+}
+
+func parseListunspent(uint8Listunspent []byte) string {
+	var listunspentInfo interface{}
+	err := json.Unmarshal(uint8Listunspent, &listunspentInfo)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("listunspentInfo=", listunspentInfo)
+	fmt.Println("len(listunspentInfo)=", len(listunspentInfo.([]interface{})))
+
+	var slicOutput []map[string]interface{}
+	for i := 0; i < len(listunspentInfo.([]interface{})); i++ {
+		mapListunspent := make(map[string]interface{})
+		mapListunspent["txid"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["txid"]
+		mapListunspent["vout"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["vout"]
+		slicOutput = append(slicOutput, mapListunspent)
+	}
+	txOutputs, err2 := json.Marshal(slicOutput)
+	if err2 != nil {
+		log.Fatalln(err2)
+	}
+	fmt.Println("txOutputs=", string(txOutputs))
+	return string(txOutputs)
+}
+func listunspent() {
+
+}
+
+func createrawtransaction() {
+	// reqJson = `{"method":"createrawtransaction","params":[[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2}], [{"STCwWTDAd3vYEG5MBL1R5mju8qu3vMTXD8":16},{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg":5.04251795}]],"id":1}`
+	makeReqJson("createrawtransaction", "createrawtransaction")
 }
 
 func main() {
@@ -47,22 +92,17 @@ func main() {
 		log.Fatalln(err)
 	}
 	// reqJson := `{"jsonrpc": "1.0","method":"listunspent","params":[1, 9999999, [], true, {"minimumSumAmount":100}],"id":1}`
-	// returnJson, err2 := rpcClient.send(reqJson)
-	// if err2 != nil {
-	// 	log.Fatalln(err2)
-	// }
-	// log.Println(returnJson)
-
 	// reqJson2 := makeReqJson("listunspent", 1, 9999, `["3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"]`, true, `{"minimumSumAmount":100}`)
 	sliAddr := []string{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"}
 	mapParam := map[string]interface{}{"minimumSumAmount": 100}
-	reqJson2 := makeReqJson("listunspent", 1, 9999, sliAddr, true, mapParam)
+	reqJson2 := makeReqJson("listunspent", "listunspent", 1, 99999, sliAddr, true, mapParam)
 	returnJson2, err3 := rpcClient.send(reqJson2)
 	if err3 != nil {
 		log.Fatalln(err3)
 	}
 	log.Println("returnJson2=", returnJson2)
-	decodeJson(returnJson2)
+	rpcresponse := decodeJson(returnJson2)
+	selectCommand(&rpcresponse)
 }
 
 // func main() {

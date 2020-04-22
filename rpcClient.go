@@ -28,12 +28,12 @@ type rpcClient struct {
 type rpcRequest struct {
 	Method  string      `json:"method"`
 	Params  interface{} `json:"params"`
-	Id      int64       `json:"id"`
+	Id      interface{} `json:"id"`
 	JsonRpc string      `json:"jsonrpc"`
 }
 
 type rpcResponse struct {
-	Id     int64           `json:"id"`
+	Id     interface{}     `json:"id"`
 	Result json.RawMessage `json:"result"`
 	Err    interface{}     `json:"error"`
 }
