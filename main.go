@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 )
 
 const (
-	SERVER_HOST       = "192.168.8.101"
+	SERVER_HOST       = "192.168.0.143"
 	SERVER_PORT       = 6062
 	USER              = "chain"
 	PASSWD            = "999000"
@@ -40,21 +41,20 @@ func decodeJson(resultInfo string) rpcResponse {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println("rpcresponse.Err=", rpcresponse.Err)
-	fmt.Println("rpcresponse.Id=", rpcresponse.Id)
-	fmt.Println("rpcresponse.Result=", string(rpcresponse.Result))
+	// fmt.Println("rpcresponse.Err=", rpcresponse.Err)
+	// fmt.Println("rpcresponse.Id=", rpcresponse.Id)
+	// fmt.Println("rpcresponse.Result=", string(rpcresponse.Result))
 	return rpcresponse
 }
 
 func selectCommand(rpcresponse *rpcResponse) interface{} {
-	if rpcresponse.Id == "listunspent" {
-		strTxouts := parseListunspent(rpcresponse.Result)
-		return strTxouts
-	}
+
 	return nil
 }
 
-func parseListunspent(uint8Listunspent []byte) string {
+func parseListunspent(rpcresponse *rpcResponse) (interface{}, float64) {
+	uint8Listunspent := rpcresponse.Result
+
 	var listunspentInfo interface{}
 	err := json.Unmarshal(uint8Listunspent, &listunspentInfo)
 	if err != nil {
@@ -63,27 +63,69 @@ func parseListunspent(uint8Listunspent []byte) string {
 	fmt.Println("listunspentInfo=", listunspentInfo)
 	fmt.Println("len(listunspentInfo)=", len(listunspentInfo.([]interface{})))
 
-	var slicOutput []map[string]interface{}
+	var slicInputTx []map[string]interface{}
+	var sumAcount float64 = 0
 	for i := 0; i < len(listunspentInfo.([]interface{})); i++ {
 		mapListunspent := make(map[string]interface{})
 		mapListunspent["txid"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["txid"]
 		mapListunspent["vout"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["vout"]
-		slicOutput = append(slicOutput, mapListunspent)
+		// mapListunspent["scriptPubKey"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["scriptPubKey"]
+		// mapListunspent["address"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["address"]
+		// mapListunspent["amount"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["amount"]
+		slicInputTx = append(slicInputTx, mapListunspent)
+		sumAcount += listunspentInfo.([]interface{})[i].(map[string]interface{})["amount"].(float64)
 	}
-	txOutputs, err2 := json.Marshal(slicOutput)
-	if err2 != nil {
-		log.Fatalln(err2)
-	}
-	fmt.Println("txOutputs=", string(txOutputs))
-	return string(txOutputs)
+	return slicInputTx, sumAcount
 }
-func listunspent() {
+func listunspent(arg ...interface{}) string {
+	minconf := arg[0]
+	maxconf := arg[1]
+	address := arg[2]
+	isSafe := arg[3]
+	queryOption := arg[4:][0] //此处可待优化
 
+	reqJson := makeReqJson("listunspent", "listunspent", minconf, maxconf, address, isSafe, queryOption)
+	return reqJson
 }
 
-func createrawtransaction() {
+func createrawtransaction(arg ...interface{}) string {
 	// reqJson = `{"method":"createrawtransaction","params":[[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2}], [{"STCwWTDAd3vYEG5MBL1R5mju8qu3vMTXD8":16},{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg":5.04251795}]],"id":1}`
-	makeReqJson("createrawtransaction", "createrawtransaction")
+	// {"method":"createrawtransaction","params":[[{"txid":"18bf31178fd79fa6a98d03f7a29c6acbb15760642dd812bfdef0c0f4257a0a00","vout":2},{"txid":"eb36490e5b034f9ffcdbf5674ea825379723aa643e4d76c4628f49f8673b1400","vout":2}],[{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg":3.0851359,"SWX9b3z4K47fLq8vK6x7FUM7XTj6r9Gr1V":39}]],"id":"createrawtransaction","jsonrpc":"1.0"}
+
+	inputs := arg[0]
+	outputs := arg[1]
+	// fmt.Println("inputs=", inputs)
+	// fmt.Println("outputs=", outputs)
+	reqJson := makeReqJson("createrawtransaction", "createrawtransaction", inputs, outputs)
+	return reqJson
+}
+
+func parseCreaterawtransaction(rpcresponse *rpcResponse) interface{} {
+	uint8Createrawtransaction := rpcresponse.Result
+	var CreaterawtransactionInfo interface{}
+	err := json.Unmarshal(uint8Createrawtransaction, &CreaterawtransactionInfo)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// fmt.Println("CreaterawtransactionInfo=", CreaterawtransactionInfo)
+	return CreaterawtransactionInfo
+}
+
+func signrawtransactionwithkey(arg ...interface{}) string {
+
+	txHex := arg[0]
+	privKey := arg[1]
+	reqJson := makeReqJson("signrawtransactionwithkey", "signrawtransactionwithkey", txHex, privKey)
+	fmt.Println("reqJson=", reqJson)
+	return reqJson
+}
+
+func sendRpcRequest(client *rpcClient, reqJson string) string {
+	returnJson, err := client.send(reqJson)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return returnJson
 }
 
 func main() {
@@ -91,18 +133,57 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// reqJson := `{"jsonrpc": "1.0","method":"listunspent","params":[1, 9999999, [], true, {"minimumSumAmount":100}],"id":1}`
-	// reqJson2 := makeReqJson("listunspent", 1, 9999, `["3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"]`, true, `{"minimumSumAmount":100}`)
+
+	//命令:listunspent
 	sliAddr := []string{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"}
-	mapParam := map[string]interface{}{"minimumSumAmount": 100}
-	reqJson2 := makeReqJson("listunspent", "listunspent", 1, 99999, sliAddr, true, mapParam)
-	returnJson2, err3 := rpcClient.send(reqJson2)
-	if err3 != nil {
-		log.Fatalln(err3)
-	}
-	log.Println("returnJson2=", returnJson2)
-	rpcresponse := decodeJson(returnJson2)
-	selectCommand(&rpcresponse)
+	mapParam := map[string]interface{}{"minimumSumAmount": 40, "minimumAmount": 1}
+
+	reqListunspent := listunspent(1, 99999, sliAddr, true, mapParam)
+	returnJson := sendRpcRequest(rpcClient, reqListunspent)
+	log.Println("returnJson=", returnJson)
+
+	rpcresponse := decodeJson(returnJson)
+	// inputTx := selectCommand(&rpcresponse)
+	inputs, sumAcount := parseListunspent(&rpcresponse)
+	fmt.Println("inputs=", inputs)
+
+	//命令:createrawtransaction
+	distAddr := "SWX9b3z4K47fLq8vK6x7FUM7XTj6r9Gr1V"
+	var distAcount float64 = 39
+	changeAddr := "3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"
+	tempChangeAcount := sumAcount - distAcount - 0.0001
+	changeAcount, _ := strconv.ParseFloat(fmt.Sprintf("%.8f", tempChangeAcount), 64)
+
+	mapDistout := make(map[string]interface{})
+	mapChangeout := make(map[string]interface{})
+	mapDistout[distAddr] = 39
+	mapChangeout[changeAddr] = changeAcount
+	outputs := []map[string]interface{}{}
+	outputs = append(outputs, mapDistout, mapChangeout)
+
+	reqCreaterawtransaction := createrawtransaction(inputs, outputs)
+	returnJson = sendRpcRequest(rpcClient, reqCreaterawtransaction)
+	fmt.Println("returnJson=", returnJson)
+	rpcresponse = decodeJson(returnJson)
+	txHex := parseCreaterawtransaction(&rpcresponse)
+	fmt.Println("txHex=", txHex)
+
+	//命令:signrawtransactionwithkey
+	// 	reqJson = `{"method":"signrawtransactionwithkey",
+	// "params":[
+	// "0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f02000000b500473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd01004c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53aeffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000",
+	// ["Ky4CzdZ6VJsHFfH8DwFvk488XgzDb6g4ijqZmYxhL3M4iFyuZdAx"],
+	// [{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00",
+	// "vout":2,
+	// "scriptPubKey":"a914ef753a876709cc4a834d52d2090425e75250079087",
+	// "redeemScript":"522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae",
+	// "amount":21.04261795}]
+	// ],"id":1}`
+	privKey := []string{"KyVzoDL4UbM3PmMaGgSZRWuADq3Au5R9wC8oBYajxtsY8eEtaMcv"}
+	redeemScript = "522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae"
+	signrawtransactionwithkey(txHex, privKey)
+	// reqSignrawtransactionwithkey := signrawtransactionwithkey(txHex)
+
 }
 
 // func main() {
