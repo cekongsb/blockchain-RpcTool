@@ -37,6 +37,9 @@ type rpcResponse struct {
 	Result json.RawMessage `json:"result"`
 	Err    interface{}     `json:"error"`
 }
+type signHex struct {
+	Hex string `json:"hex"`
+}
 
 //连接配置
 func newClient(host string, port int, user, passwd string, useSSL bool) (c *rpcClient, err error) {
