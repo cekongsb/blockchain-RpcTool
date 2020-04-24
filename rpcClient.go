@@ -41,6 +41,13 @@ type signHex struct {
 	Hex string `json:"hex"`
 }
 
+type txInfo struct {
+	DistAddr   string   `json:"distaddr"`
+	FundAddr   string   `json:"fundaddr"`
+	SendAcount float64  `json:"sendacount"`
+	SignKey    []string `json:"signkey"`
+}
+
 //连接配置
 func newClient(host string, port int, user, passwd string, useSSL bool) (c *rpcClient, err error) {
 	if len(host) == 0 {
