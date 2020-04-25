@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,15 +11,15 @@ import (
 )
 
 const (
-	SERVER_HOST       = "192.168.0.125"
-	SERVER_PORT       = 9380
+	SERVER_HOST       = "192.168.0.143"
+	SERVER_PORT       = 6062
 	USER              = "chain"
 	PASSWD            = "999000"
 	USESSL            = false
 	WALLET_PASSPHRASE = "WalletPassphrase"
 )
 
-func makeReqJson(arg ...interface{}) string {
+func makeReqJson(arg ...interface{}) (string, error) {
 	var stuReqJson rpcRequest
 
 	stuReqJson.JsonRpc = "1.0"
@@ -28,24 +29,19 @@ func makeReqJson(arg ...interface{}) string {
 
 	reqJson, err := json.Marshal(stuReqJson)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("json.Marshal(stuReqJson) err:", err)
 	}
 	fmt.Println(stuReqJson.Method, "reqJson=", string(reqJson))
-	return string(reqJson)
+	return string(reqJson), err
 }
 
-func decodeJson(resultInfo string) rpcResponse {
+func decodeJson(resultInfo string) (rpcResponse, error) {
 	var rpcresponse rpcResponse
 	err := json.Unmarshal([]byte(resultInfo), &rpcresponse)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("json.Unmarshal([]byte(resultInfo), &rpcresponse) err:", err)
 	}
-	return rpcresponse
-}
-
-func selectCommand(rpcresponse *rpcResponse) interface{} {
-
-	return nil
+	return rpcresponse, err
 }
 
 func parseListunspent(rpcresponse *rpcResponse) (interface{}, interface{}, float64) {
@@ -54,7 +50,7 @@ func parseListunspent(rpcresponse *rpcResponse) (interface{}, interface{}, float
 	var listunspentInfo interface{}
 	err := json.Unmarshal(uint8Listunspent, &listunspentInfo)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("json.Unmarshal(uint8Listunspent, &listunspentInfo):", err)
 	}
 	fmt.Println("listunspentInfo=", listunspentInfo)
 	fmt.Println("len(listunspentInfo)=", len(listunspentInfo.([]interface{})))
@@ -72,7 +68,7 @@ func parseListunspent(rpcresponse *rpcResponse) (interface{}, interface{}, float
 		mapListunspent["amount"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["amount"]
 		mapListunspent["txid"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["txid"]
 		mapListunspent["vout"] = listunspentInfo.([]interface{})[i].(map[string]interface{})["vout"]
-		mapListunspent["redeemScript"] = "5221027ae577fa58d2309dee977ed5acc7d630af967409a7bb2630dba864031eecf05c21030c465532f86d29fcba1e87edc22225ab5220636ff4f594fecb046f164ef27718210371cb6debd35cd607f37ea5debefe4941b2d99c8ac2983d2d7f66206ff687069153ae"
+		mapListunspent["redeemScript"] = "522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae"
 
 		slicInputTx = append(slicInputTx, mapInput)
 		slicListunspent = append(slicListunspent, mapListunspent)
@@ -88,74 +84,78 @@ func listunspent(arg ...interface{}) string {
 	isSafe := arg[3]
 	queryOption := arg[4:][0] //此处可待优化
 
-	reqJson := makeReqJson("listunspent", "listunspent", minconf, maxconf, address, isSafe, queryOption)
+	reqJson, _ := makeReqJson("listunspent", "listunspent", minconf, maxconf, address, isSafe, queryOption)
 	return reqJson
 }
 
 func createrawtransaction(arg ...interface{}) string {
 	inputs := arg[0]
 	outputs := arg[1]
-	reqJson := makeReqJson("createrawtransaction", "createrawtransaction", inputs, outputs)
+	reqJson, _ := makeReqJson("createrawtransaction", "createrawtransaction", inputs, outputs)
 	return reqJson
 }
 
-func parseCreaterawtransaction(rpcresponse *rpcResponse) interface{} {
+func parseCreaterawtransaction(rpcresponse *rpcResponse) (interface{}, error) {
 	uint8Createrawtransaction := rpcresponse.Result
 	var CreaterawtransactionInfo interface{}
 	err := json.Unmarshal(uint8Createrawtransaction, &CreaterawtransactionInfo)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("json.Unmarshal(uint8Createrawtransaction, &CreaterawtransactionInfo):", err)
 	}
-	return CreaterawtransactionInfo
+	return CreaterawtransactionInfo, err
 }
 
 func signrawtransactionwithkey(arg ...interface{}) string {
 	txHex := arg[0]
 	privKey := arg[1]
 	listunspentInfo := arg[2]
-	reqJson := makeReqJson("signrawtransactionwithkey", "signrawtransactionwithkey", txHex, privKey, listunspentInfo)
+	reqJson, _ := makeReqJson("signrawtransactionwithkey", "signrawtransactionwithkey", txHex, privKey, listunspentInfo)
 	return reqJson
 }
 
-func parseSignrawtransactionwithkey(rpcresponse *rpcResponse) interface{} {
+func parseSignrawtransactionwithkey(rpcresponse *rpcResponse) (interface{}, error) {
 	uint8SignTxKey := rpcresponse.Result
 	var signhex signHex
 	err := json.Unmarshal(uint8SignTxKey, &signhex)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("json.Unmarshal(uint8SignTxKey, &signhex) err:", err)
 	}
-	return signhex.Hex
+	return signhex.Hex, err
 }
 
 func sendrawtransaction(arg ...interface{}) string {
 	hex := arg[0]
-	reqJson := makeReqJson("sendrawtransaction", "sendrawtransaction", hex)
+	reqJson, _ := makeReqJson("sendrawtransaction", "sendrawtransaction", hex)
 	return reqJson
 }
 
-func sendRpcRequest(client *rpcClient, reqJson string) string {
+func sendRpcRequest(client *rpcClient, reqJson string) (string, error) {
 	returnJson, err := client.send(reqJson)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("client.send(reqJson):", err)
 	}
-	return returnJson
+	return returnJson, err
 }
 
-func makeMultisigTx(distaddr string, fundaddr string, sendacount float64, signkey []string) {
+func makeMultisigTx(distaddr string, fundaddr string, sendacount float64, signkey []string) error {
 	rpcClient, err := newClient(SERVER_HOST, SERVER_PORT, USER, PASSWD, USESSL)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("newClient:", err)
 	}
+	var respErr error
 	//命令:listunspent
 	// sliAddr := []string{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"}
 	sliAddr := []string{fundaddr}
-	mapParam := map[string]interface{}{"minimumSumAmount": 1200 /*, "minimumAmount": 0.05*/}
+	mapParam := map[string]interface{}{"minimumSumAmount": 600 /*, "minimumAmount": 0.05*/}
 
 	reqListunspent := listunspent(100, 99999999, sliAddr, true, mapParam)
-	returnJson := sendRpcRequest(rpcClient, reqListunspent)
+	returnJson, rpcErr := sendRpcRequest(rpcClient, reqListunspent)
+	if rpcErr != nil {
+		respErr = errors.New("rpc_command:listunspent send fail..")
+	}
 	log.Println("returnJson_list=", returnJson)
 
-	rpcresponse := decodeJson(returnJson)
+	rpcresponse, _ := decodeJson(returnJson)
 	inputs, slicListunspent, sumAcount := parseListunspent(&rpcresponse)
 	fmt.Println("inputs=", inputs)
 
@@ -180,10 +180,13 @@ func makeMultisigTx(distaddr string, fundaddr string, sendacount float64, signke
 	outputs = append(outputs, mapDistout, mapChangeout)
 
 	reqCreaterawtransaction := createrawtransaction(inputs, outputs)
-	returnJson = sendRpcRequest(rpcClient, reqCreaterawtransaction)
+	returnJson, rpcErr = sendRpcRequest(rpcClient, reqCreaterawtransaction)
+	if rpcErr != nil {
+		respErr = errors.New("rpc_command:createrawtransaction send fail..")
+	}
 	fmt.Println("returnJson_cretx=", returnJson)
-	rpcresponse = decodeJson(returnJson)
-	txHex := parseCreaterawtransaction(&rpcresponse)
+	rpcresponse, _ = decodeJson(returnJson)
+	txHex, _ := parseCreaterawtransaction(&rpcresponse)
 	fmt.Println("txHex=", txHex)
 
 	//命令:signrawtransactionwithkey
@@ -191,24 +194,34 @@ func makeMultisigTx(distaddr string, fundaddr string, sendacount float64, signke
 	// privKey1 := []string{"KyVzoDL4UbM3PmMaGgSZRWuADq3Au5R9wC8oBYajxtsY8eEtaMcv"}
 	privKey1 := []string{signkey[0]}
 	reqSignrawtransactionwithkey1 := signrawtransactionwithkey(txHex, privKey1, slicListunspent)
-	returnJson = sendRpcRequest(rpcClient, reqSignrawtransactionwithkey1)
+	returnJson, rpcErr = sendRpcRequest(rpcClient, reqSignrawtransactionwithkey1)
+	if rpcErr != nil {
+		respErr = errors.New("rpc_command:signrawtransactionwithkey send fail..")
+	}
 	fmt.Println("returnJson_sign1=", returnJson)
-	rpcresponse = decodeJson(returnJson)
-	signHex1 := parseSignrawtransactionwithkey(&rpcresponse)
+	rpcresponse, _ = decodeJson(returnJson)
+	signHex1, _ := parseSignrawtransactionwithkey(&rpcresponse)
 	//签名2：
 	// privKey2 := []string{"Ky4CzdZ6VJsHFfH8DwFvk488XgzDb6g4ijqZmYxhL3M4iFyuZdAx"}
 	privKey2 := []string{signkey[1]}
 	reqSignrawtransactionwithkey2 := signrawtransactionwithkey(signHex1, privKey2, slicListunspent)
-	returnJson = sendRpcRequest(rpcClient, reqSignrawtransactionwithkey2)
+	returnJson, rpcErr = sendRpcRequest(rpcClient, reqSignrawtransactionwithkey2)
+	if rpcErr != nil {
+		respErr = errors.New("rpc_command:signrawtransactionwithkey send fail..")
+	}
 	fmt.Println("returnJson_sign2=", returnJson)
-	rpcresponse = decodeJson(returnJson)
-	signHex2 := parseSignrawtransactionwithkey(&rpcresponse)
+	rpcresponse, _ = decodeJson(returnJson)
+	signHex2, _ := parseSignrawtransactionwithkey(&rpcresponse)
 	fmt.Println("signHex2=", signHex2)
 
 	//命令:sendrawtransaction
 	reqSendrawtransaction := sendrawtransaction(signHex2)
-	returnJson = sendRpcRequest(rpcClient, reqSendrawtransaction)
+	returnJson, rpcErr = sendRpcRequest(rpcClient, reqSendrawtransaction)
+	if rpcErr != nil {
+		respErr = errors.New("rpc_command:sendrawtransaction send fail..")
+	}
 	fmt.Println("returnJson_brocast=", returnJson)
+	return respErr
 }
 
 func MultisigTx(w http.ResponseWriter, r *http.Request) {
@@ -218,16 +231,17 @@ func MultisigTx(w http.ResponseWriter, r *http.Request) {
 			fmt.Errorf("unexpected error:%v", x)
 		}
 	}()
+
 	defer r.Body.Close()
 
 	ReadInfo, err1 := ioutil.ReadAll(r.Body)
 	if err1 != nil {
-		log.Fatal(err1)
+		fmt.Println("ioutil.ReadAll(r.Body):", err1)
 	}
 
 	err2 := json.Unmarshal(ReadInfo, &txinfo)
 	if err2 != nil {
-		log.Fatal("err2: ", err2)
+		fmt.Println("json.Unmarshal err: ", err2)
 	}
 
 	distaddr := txinfo.DistAddr
@@ -235,26 +249,38 @@ func MultisigTx(w http.ResponseWriter, r *http.Request) {
 	sendacount := txinfo.SendAcount
 	signkey := txinfo.SignKey
 
-	if sendacount > 1000 {
-		slinum := int(sendacount / 1000)
+	var msErr error
+	if sendacount > 500 {
+		slinum := int(sendacount / 500)
 		fmt.Println("slinum:", slinum)
 		for i := 0; i < slinum; i++ {
-			makeMultisigTx(distaddr, fundaddr, 1000, signkey)
+			msErr = makeMultisigTx(distaddr, fundaddr, 500, signkey)
+			if msErr != nil {
+				w.Write([]byte("makeMultisigTx fail"))
+				return
+			}
 		}
-		remainAcount := sendacount - float64(1000*slinum)
+		remainAcount := sendacount - float64(500*slinum)
 		if remainAcount > 0 {
-			makeMultisigTx(distaddr, fundaddr, remainAcount, signkey)
+			msErr = makeMultisigTx(distaddr, fundaddr, remainAcount, signkey)
+			if msErr != nil {
+				w.Write([]byte("makeMultisigTx fail"))
+				return
+			}
 		}
 	} else {
-		makeMultisigTx(distaddr, fundaddr, sendacount, signkey)
+		msErr = makeMultisigTx(distaddr, fundaddr, sendacount, signkey)
+		if msErr != nil {
+			w.Write([]byte("makeMultisigTx fail"))
+			return
+		}
 	}
-
 	w.Write([]byte("successfully complete transaction"))
 }
 
 func main() {
 	http.HandleFunc("/", MultisigTx)
-	err := http.ListenAndServe("192.168.0.181:9090", nil)
+	err := http.ListenAndServe("192.168.0.188:9090", nil)
 	if err != nil {
 		log.Fatal("ListenAndServer: ", err)
 	}
