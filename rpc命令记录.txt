@@ -1,0 +1,265 @@
+reqJson := "{\"method\":\"listunspent\",\"params\":[],\"id\":1}"
+
+命令：listunspent
+Arguments:
+1. minconf                            (numeric, optional, default=1) The minimum confirmations to filter
+2. maxconf                            (numeric, optional, default=9999999) The maximum confirmations to filter
+3. addresses                          (json array, optional, default=empty array) A json array of syscoin addresses to filter
+     [
+       "address",                     (string) syscoin address
+       ...
+     ]
+4. include_unsafe                     (boolean, optional, default=true) Include outputs that are not safe to spend
+                                      See description of "safe" attribute below.
+5. query_options                      (json object, optional) JSON with query options
+     {
+       "minimumAmount": amount,       (numeric or string, optional, default=0) Minimum value of each UTXO in VCL
+       "maximumAmount": amount,       (numeric or string, optional, default=unlimited) Maximum value of each UTXO in VCL
+       "maximumCount": n,             (numeric, optional, default=unlimited) Maximum number of UTXOs
+       "minimumSumAmount": amount,    (numeric or string, optional, default=unlimited) Minimum sum value of all UTXOs in VCL
+     }
+Examples:
+> vircles-cli listunspent 
+> vircles-cli listunspent 6 9999999 "[\"1PGFqEzfmQch1gKD3ra4k18PNj3tTUUSqg\",\"1LtvqCaApEdUGFkpKMM4MstjcaL4dKg8SP\"]"
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "listunspent", "params": [6, 9999999 "[\"1PGFqEzfmQch1gKD3ra4k18PNj3tTUUSqg\",\"1LtvqCaApEdUGFkpKMM4MstjcaL4dKg8SP\"]"] }' -H 'content-type: text/plain;' http://127.0.0.1:8370/
+> vircles-cli listunspent 6 9999999 '[]' true '{ "minimumAmount": 0.005 }'
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "listunspent", "params": [6, 9999999, [] , true, { "minimumAmount": 0.005 } ] }' -H 'content-type: text/plain;' http://127.0.0.1:8370/
+
+reqJson := "{\"method\":\"listunspent\",\"params\":[1, 9999, [], true, {\"minimumSumAmount\":100}],\"id\":1}"
+2020/04/21 16:55:10 returnJson: 
+{"result":
+[{"txid":"636614e4cc7698fd47ab84d66a77cac17a6614389d558df6ab1ac1c7a00c1d02","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":110,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true},
+ {"txid":"1b5c6926ce7deb626f9a6465303add9a0d224c44ec3d42bcda98dfd582b62a0c","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":222,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true},
+ {"txid":"b743aeb8b34e1a90758a8865ed02a73f7af772b7fec736dee9ab8a26655f9712","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":162,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true},
+ {"txid":"6d65580c39fd855f648752c93d3743cf5c2befc30271afb1559c75e50ffdf012","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":173,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true},
+ {"txid":"a88caf4fa545410e731f83cce461ed55c1dbf3c8a6725c9464b962c0dfc65c17","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":126,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true},
+ {"txid":"5c8070cfc755ce5b513d296bca47c60e28ec35e23b9e8406494161c89de29e19","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":157,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true},
+ {"txid":"5f450099168a7303e105c66d719a9cbeaba0828c040334f509ecfd68c307f821","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":161,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true},
+ {"txid":"28b43c882446e64bf73a9d7e41942c078e421e92bc40c650665644d3ba555b23","vout":4,"address":"Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P","label":"","scriptPubKey":"76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac","amount":12.65399999,"confirmations":122,"spendable":true,"solvable":true,"desc":"pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz","safe":true}],
+  "error":null,
+  "id":1}
+  
+  
+  2020/04/22 09:12:02 
+  [
+  map[address:Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P amount:12.65399999 confirmations:620 desc:pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz label: safe:true scriptPubKey:76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac solvable:true spendable:true txid:109b4eb5a6658f19cf3d929dd04ff426239cea9c9c924c0ae0e26ef503ed0001 vout:4] 
+  map[address:Sc47wyXtBxPRaw66pT35aXV3EyZ72VZw5P amount:12.65399999 confirmations:352 desc:pkh([1f5f1e2e/0'/0'/1']024d24ee451b555e8b4069670e57f4f64a47f677d15d8b95cdb6a986997da3d215)#vap465qz label: safe:true scriptPubKey:76a914a1e9d628c48c5e737703f54e7ae8fa5e012ad9c288ac solvable:true spendable:true txid:a8a9529a4ff496cd1271e58fb2c6b5b03407607c8230b6994626d45bc63c1101 vout:4]
+  ]
+
+成功示例
+reqJson := `{"method":"listunspent","params":[1, 9999999, ["3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"], true, {"minimumSumAmount":40}],"id":1}`
+                                      {"method":"listunspent","params":[100,99999999,["3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"],true,{"minimumSumAmount":520}],"id":"listunspent","jsonrpc":"1.0"}
+curl --user chain --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "listunspent", "params": [100,99999999,["3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg"],true,{"minimumSumAmount":520}] }' -H 'content-type: text/plain;' http://127.0.0.1:6062/
+  
+命令：createrawtransaction
+createrawtransaction [{"txid":"hex","vout":n,"sequence":n},...] [{"address":amount},{"data":"hex"},...] ( locktime replaceable )
+
+Create a transaction spending the given inputs and creating new outputs.
+Outputs can be addresses or data.
+Returns hex-encoded raw transaction.
+Note that the transaction's inputs are not signed, and
+it is not stored in the wallet or transmitted to the network.
+
+Arguments:
+1. inputs                      (json array, required) A json array of json objects
+     [
+       {                       (json object)
+         "txid": "hex",        (string, required) The transaction id
+         "vout": n,            (numeric, required) The output number
+         "sequence": n,        (numeric, optional, default=depends on the value of the 'replaceable' and 'locktime' arguments) The sequence number
+       },
+       ...
+     ]
+2. outputs                     (json array, required) a json array with outputs (key-value pairs), where none of the keys are duplicated.
+                               That is, each address can only appear once and there can only be one 'data' object.
+                               For compatibility reasons, a dictionary, which holds the key-value pairs directly, is also
+                               accepted as second parameter.
+     [
+       {                       (json object)
+         "address": amount,    (numeric or string, required) A key-value pair. The key (string) is the syscoin address, the value (float or string) is the amount in VCL
+       },
+       {                       (json object)
+         "data": "hex",        (string, required) A key-value pair. The key must be "data", the value is hex-encoded data
+       },
+       ...
+     ]
+3. locktime                    (numeric, optional, default=0) Raw locktime. Non-0 value also locktime-activates inputs
+4. replaceable                 (boolean, optional, default=false) Marks this transaction as BIP125-replaceable.
+                               Allows this transaction to be replaced by a transaction with higher fees. If provided, it is an error if explicit sequence numbers are incompatible.
+
+Result:
+"transaction"              (string) hex string of the transaction
+
+Examples:
+> vircles-cli createrawtransaction "[{\"txid\":\"myid\",\"vout\":0}]" "[{\"address\":0.01}]"
+> vircles-cli createrawtransaction "[{\"txid\":\"myid\",\"vout\":0}]" "[{\"data\":\"00010203\"}]"
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "createrawtransaction", "params": ["[{\"txid\":\"myid\",\"vout\":0}]", "[{\"address\":0.01}]"] }' -H 'content-type: text/plain;' http://127.0.0.1:8370/
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "createrawtransaction", "params": ["[{\"txid\":\"myid\",\"vout\":0}]", "[{\"data\":\"00010203\"}]"] }' -H 'content-type: text/plain;' http://127.0.0.1:8370/
+
+不同RPC请求方式的成功示例
+createrawtransaction "[{\"txid\":\"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00\",\"vout\":2}]" "[{\"STCwWTDAd3vYEG5MBL1R5mju8qu3vMTXD8\":16},{\"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg\":5.04251795}]"
+curl --user chain --data-binary '{"method":"createrawtransaction","params":[[{"txid":"2e9aea9b8ef794c0b1d02b10c1f83cdc29ea23d3845ea645a5d18a1ac9b10400","vout":1},{"txid":"656410aa153ff3f6f8cb3962f2e0d69885e6b7b241654f50fd4bb1d4a3d00400","vout":1},{"txid":"a820712b1a7d8f43c5cd95dbf88e2030017ba96bb90eba8b14c43cd9b43d0a00","vout":1},{"txid":"6a12eafe1641fcaeae5ec0d0fb10cb2b7a5f362caac2af84a698856fe4dd0d00","vout":1},{"txid":"a69343f75e047639160a36b6ca78f0ab783bffbe04a830f35fe9841741e90f00","vout":1},{"txid":"3592b9c4a8efd634d785dcc276425d3611792d94c437a5894e2a349a40981000","vout":1},{"txid":"e2777f188dae698017c30bede89f2ee37a945715084d178a7b95160220a81400","vout":1},{"txid":"bae6f0e8f3b5170b8ac7c6b305594587678753f62254a15e05c8f9e1e7981500","vout":1},{"txid":"7a4f1f89f71fa764811a8e3da2cb5f3a107e428e4737ed3dd0d2d6274f351900","vout":1},{"txid":"e4e65e7773eafbf20a306bc3721d2ad0bea69c2d14b8dd720112c2ed1fba1a00","vout":1},{"txid":"a09e531b6d82077740c85fe662417e426e460b029f6d4ace8350782f2ae21c00","vout":1},{"txid":"390d4f2c00360ab82d03225eeafe48bf5ffa15b8ef98245331978f6b14f41f00","vout":1},{"txid":"87e49872166ec9f2b4e08cbf112602674fc476cb6ffb30ff253e8bc0b34c2500","vout":1},{"txid":"713c61e26796ed6ff37e54fe76c8aeae574622276656de1d50d29182ee882600","vout":1},{"txid":"26727adb24747d9c6cc327f2d31b6613973217a413a382e0fc9e6fc399042900","vout":1},{"txid":"caeaa195e86c2ffb8208e09277da5ef8e15a7c0e42db9d6881f8665f5d7e3000","vout":1},{"txid":"4ab27a559dadbcb4bbd0475b54d786a9d57769305bb8faec55d49b10af2e3200","vout":1},{"txid":"fe897926fd135fd631053ba9c146c1788dd2a6e215b35768db394461dc293300","vout":1},{"txid":"50470eca5d643fe001bc456cba22fba9d00b81dc29e4e825635434f0bab53500","vout":1},{"txid":"256740ee4ce588c585095535efbec4ac38929546f273ea3f72041b9a90c43d00","vout":1},{"txid":"c0ece5d795775b05664b4214e280ef5e88e8fce6c242279f85992cc67e0d4e00","vout":1},{"txid":"09995f066b10846e2e6fca4264d8d8529d1d6b9f0046a99e810b4a53c4754f00","vout":1},{"txid":"10e50c7d8547efe5d1c138d5d597e5db9f0b314aabfb44b7d1a57a94e2ad5300","vout":1}],[{"3HJppSiSVF3BhrvzSL8hBBR7pEh9V13Q9e":100},{"3HJppSiSVF3BhrvzSL8hBBR7pEh9V13Q9e":1125.43822259}]],"id":"createrawtransaction","jsonrpc":"1.0"}' -H 'content-type: text/plain;' http://127.0.0.1:9380/
+reqJson = `{"method":"createrawtransaction","params":[[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2}], [{"STCwWTDAd3vYEG5MBL1R5mju8qu3vMTXD8":16},{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg":5.04251795}]],"id":1}`
+
+
+{"method":"createrawtransaction","params":[[{"txid":"2e9aea9b8ef794c0b1d02b10c1f83cdc29ea23d3845ea645a5d18a1ac9b10400","vout":1},{"txid":"656410aa153ff3f6f8cb3962f2e0d69885e6b7b241654f50fd4bb1d4a3d00400","vout":1},{"txid":"a820712b1a7d8f43c5cd95dbf88e2030017ba96bb90eba8b14c43cd9b43d0a00","vout":1},{"txid":"6a12eafe1641fcaeae5ec0d0fb10cb2b7a5f362caac2af84a698856fe4dd0d00","vout":1},{"txid":"a69343f75e047639160a36b6ca78f0ab783bffbe04a830f35fe9841741e90f00","vout":1},{"txid":"3592b9c4a8efd634d785dcc276425d3611792d94c437a5894e2a349a40981000","vout":1},{"txid":"e2777f188dae698017c30bede89f2ee37a945715084d178a7b95160220a81400","vout":1},{"txid":"bae6f0e8f3b5170b8ac7c6b305594587678753f62254a15e05c8f9e1e7981500","vout":1},{"txid":"7a4f1f89f71fa764811a8e3da2cb5f3a107e428e4737ed3dd0d2d6274f351900","vout":1},{"txid":"e4e65e7773eafbf20a306bc3721d2ad0bea69c2d14b8dd720112c2ed1fba1a00","vout":1},{"txid":"a09e531b6d82077740c85fe662417e426e460b029f6d4ace8350782f2ae21c00","vout":1},{"txid":"390d4f2c00360ab82d03225eeafe48bf5ffa15b8ef98245331978f6b14f41f00","vout":1},{"txid":"87e49872166ec9f2b4e08cbf112602674fc476cb6ffb30ff253e8bc0b34c2500","vout":1},{"txid":"713c61e26796ed6ff37e54fe76c8aeae574622276656de1d50d29182ee882600","vout":1},{"txid":"26727adb24747d9c6cc327f2d31b6613973217a413a382e0fc9e6fc399042900","vout":1},{"txid":"caeaa195e86c2ffb8208e09277da5ef8e15a7c0e42db9d6881f8665f5d7e3000","vout":1},{"txid":"4ab27a559dadbcb4bbd0475b54d786a9d57769305bb8faec55d49b10af2e3200","vout":1},{"txid":"fe897926fd135fd631053ba9c146c1788dd2a6e215b35768db394461dc293300","vout":1},{"txid":"50470eca5d643fe001bc456cba22fba9d00b81dc29e4e825635434f0bab53500","vout":1},{"txid":"256740ee4ce588c585095535efbec4ac38929546f273ea3f72041b9a90c43d00","vout":1},{"txid":"c0ece5d795775b05664b4214e280ef5e88e8fce6c242279f85992cc67e0d4e00","vout":1},{"txid":"09995f066b10846e2e6fca4264d8d8529d1d6b9f0046a99e810b4a53c4754f00","vout":1},{"txid":"10e50c7d8547efe5d1c138d5d597e5db9f0b314aabfb44b7d1a57a94e2ad5300","vout":1}],[{"3HJppSiSVF3BhrvzSL8hBBR7pEh9V13Q9e":100},{"3HJppSiSVF3BhrvzSL8hBBR7pEh9V13Q9e":1125.43822259}]],"id":"createrawtransaction","jsonrpc":"1.0"}
+
+
+
+返回结果：
+returnJson2: {"result":"0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f0200000000ffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000","error":null,"id":1}
+
+命令：signrawtransactionwithkey
+
+14:04:00
+￼
+signrawtransactionwithkey "hexstring" ["privatekey",...] ( [{"txid":"hex","vout":n,"scriptPubKey":"hex","redeemScript":"hex","witnessScript":"hex","amount":amount},...] "sighashtype" )
+
+Sign inputs for raw transaction (serialized, hex-encoded).
+The second argument is an array of base58-encoded private
+keys that will be the only keys used to sign the transaction.
+The third optional argument (may be null) is an array of previous transaction outputs that
+this transaction depends on but may not yet be in the block chain.
+
+Arguments:
+1. hexstring                        (string, required) The transaction hex string
+2. privkeys                         (json array, required) A json array of base58-encoded private keys for signing
+     [
+       "privatekey",                (string) private key in base58-encoding
+       ...
+     ]
+3. prevtxs                          (json array, optional) A json array of previous dependent transaction outputs
+     [
+       {                            (json object)
+         "txid": "hex",             (string, required) The transaction id
+         "vout": n,                 (numeric, required) The output number
+         "scriptPubKey": "hex",     (string, required) script key
+         "redeemScript": "hex",     (string) (required for P2SH) redeem script
+         "witnessScript": "hex",    (string) (required for P2WSH or P2SH-P2WSH) witness script
+         "amount": amount,          (numeric or string) (required for Segwit inputs) the amount spent
+       },
+       ...
+     ]
+4. sighashtype                      (string, optional, default=ALL) The signature hash type. Must be one of:
+                                    "ALL"
+                                    "NONE"
+                                    "SINGLE"
+                                    "ALL|ANYONECANPAY"
+                                    "NONE|ANYONECANPAY"
+                                    "SINGLE|ANYONECANPAY"
+                                    
+
+Result:
+{
+  "hex" : "value",                  (string) The hex-encoded raw transaction with signature(s)
+  "complete" : true|false,          (boolean) If the transaction has a complete set of signatures
+  "errors" : [                      (json array of objects) Script verification errors (if there are any)
+    {
+      "txid" : "hash",              (string) The hash of the referenced, previous transaction
+      "vout" : n,                   (numeric) The index of the output to spent and used as input
+      "scriptSig" : "hex",          (string) The hex-encoded signature script
+      "sequence" : n,               (numeric) Script sequence number
+      "error" : "text"              (string) Verification or signing error related to the input
+    }
+    ,...
+  ]
+}
+
+Examples:
+> vircles-cli signrawtransactionwithkey "myhex" "[\"key1\",\"key2\"]"
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "signrawtransactionwithkey", "params": ["myhex", "[\"key1\",\"key2\"]"] }' -H 'content-type: text/plain;' http://127.0.0.1:8370/
+
+不同RPC请求方式的成功示例
+signrawtransactionwithkey 
+"0200000001b62268e4bad95fd19d93b84e35ac27a775eca9ddaed71dd07903576971d561d60100000000ffffffff020008af2f00000000160014da61fec6568253863f1ca986221ba2014a911d53603bea0b000000002200205d35ff132dbf669c6835a00587927fc6d36a2b3829402f0da49197feb6e2dc2100000000"  
+'["KxvHEqSi1FC6oRzh9QGQUvAxWCXrALM8cSyjWD75Jy8hNHUjPZeF"]' 
+'[
+	{
+	 "txid":"d661d57169570379d01dd7aedda9ec75a727ac354eb8939dd15fd9bae46822b6",
+	 "vout":1,
+	 "scriptPubKey":"00205d35ff132dbf669c6835a00587927fc6d36a2b3829402f0da49197feb6e2dc21",
+	 "redeemScript":"522102515922f0abf5ef5819ef779d82bf3645cab1b243b3a945815af9160dad5e47b32103140ae5bc9396c516b4654d210bc6bae1f976bb080b7ebc655ba764e796aa8e7421020b0c05ddb7758c9a8bfdd0d8b13361ce0a69c40e84b77eb362e5d2fd9a4017c153ae",
+	 "amount":10
+	}
+ ]'
+
+bitcoin:SXTPWs2QGQ7XSAvEoMC9QUj8Z3A63CBFqf		p2pkh:KyVzoDL4UbM3PmMaGgSZRWuADq3Au5R9wC8oBYajxtsY8eEtaMcv
+bitcoin:Sga3uPuXupZCc6nykQW6SavHHk18j4iSUe		p2pkh:Ky4CzdZ6VJsHFfH8DwFvk488XgzDb6g4ijqZmYxhL3M4iFyuZdAx
+bitcoin:SbUNpGSpMnBQJ3ruACfp57Y5JHiGWvs55X		p2pkh:L38G74YcKGM74yXMkAn5i8bLPnwgBeTxj5B56RcnF1yeJqq7ijBh
+addmultisigaddress 2 "[\"SbUNpGSpMnBQJ3ruACfp57Y5JHiGWvs55X\",\"SXTPWs2QGQ7XSAvEoMC9QUj8Z3A63CBFqf\",\"Sga3uPuXupZCc6nykQW6SavHHk18j4iSUe\"]"
+{
+  "address": "sys1qa3tc8qfdznssaqmrr50896seupsj9kuqzmvz2sd3rsklxf4ly5dsq89k0w",
+  "redeemScript": "522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae"
+}
+成功示例：
+signrawtransactionwithkey "0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f0200000000ffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000"  '["KyVzoDL4UbM3PmMaGgSZRWuADq3Au5R9wC8oBYajxtsY8eEtaMcv"]' '[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2,"scriptPubKey":"a914ef753a876709cc4a834d52d2090425e75250079087","redeemScript":"522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae","amount":21.04261795}]'
+{
+  "hex": "0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f02000000b500473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd01004c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53aeffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000",
+  "complete": false,
+  "errors": [
+    {
+      "txid": "0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00",
+      "vout": 2,
+      "witness": [
+      ],
+      "scriptSig": "00473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd01004c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae",
+      "sequence": 4294967295,
+      "error": "CHECK(MULTI)SIG failing with non-zero signature (possibly need more signatures)"
+    }
+  ]
+}
+
+参考格式
+#curl --user chain --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "createrawtransaction", "params": [[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2}], [{"STCwWTDAd3vYEG5MBL1R5mju8qu3vMTXD8":16},{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg":5.04251795}]] }' -H 'content-type: text/plain;' http://127.0.0.1:6062/
+#reqJson = `{"method":"createrawtransaction","params":[[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2}], [{"STCwWTDAd3vYEG5MBL1R5mju8qu3vMTXD8":16},{"3PX9raYTM5MZRQahhxikPCsGcfvBvbFcWg":5.04251795}]],"id":1}`
+
+curl --user chain --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "signrawtransactionwithkey", "params": ["0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f02000000b500473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd01004c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53aeffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000",["KyVzoDL4UbM3PmMaGgSZRWuADq3Au5R9wC8oBYajxtsY8eEtaMcv"],[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2,"scriptPubKey":"a914ef753a876709cc4a834d52d2090425e75250079087","redeemScript":"522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae","amount":21.04261795}]] }' -H 'content-type: text/plain;' http://127.0.0.1:6062/
+reqJson = `{"method":"signrawtransactionwithkey","params":["0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f02000000b500473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd01004c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53aeffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000",["KyVzoDL4UbM3PmMaGgSZRWuADq3Au5R9wC8oBYajxtsY8eEtaMcv"],[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2,"scriptPubKey":"a914ef753a876709cc4a834d52d2090425e75250079087","redeemScript":"522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae","amount":21.04261795}]],"id":1}`
+
+签名2：
+reqJson = `{"method":"signrawtransactionwithkey","params":["0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f02000000b500473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd01004c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53aeffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000",["Ky4CzdZ6VJsHFfH8DwFvk488XgzDb6g4ijqZmYxhL3M4iFyuZdAx"],[{"txid":"0f0bcb033c9ff17405ef34eb966a2bf2119243532703d30c4aae6b69146e0e00","vout":2,"scriptPubKey":"a914ef753a876709cc4a834d52d2090425e75250079087","redeemScript":"522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53ae","amount":21.04261795}]],"id":1}`
+签名2返回结果：
+returnJson4: {"result":{"hex":"0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f02000000fc00473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd0147304402203d12bd93756aad8d43550e1d6bc1b6e6929d208ef2d7d32dc18988e6a5ff521a02200bf5e1e68f73a676eeea601d80f713b69707d388c486f29d913db56772482881014c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53aeffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000","complete":true},"error":null,"id":1}
+
+命令：sendrawtransaction
+
+sendrawtransaction "hexstring" ( maxfeerate )
+
+Submit a raw transaction (serialized, hex-encoded) to local node and network.
+
+Note that the transaction will be sent unconditionally to all peers, so using this
+for manual rebroadcast may degrade privacy by leaking the transaction's origin, as
+nodes will normally not rebroadcast non-wallet transactions already in their mempool.
+
+Also see createrawtransaction and signrawtransactionwithkey calls.
+
+Arguments:
+1. hexstring     (string, required) The hex string of the raw transaction
+2. maxfeerate    (numeric or string, optional, default=0.10) Reject transactions whose fee rate is higher than the specified value, expressed in VCL/kB.
+                 Set to 0 to accept any fee rate.
+                 
+
+Result:
+"hex"             (string) The transaction hash in hex
+
+Examples:
+
+Create a transaction
+> vircles-cli createrawtransaction "[{\"txid\" : \"mytxid\",\"vout\":0}]" "{\"myaddress\":0.01}"
+Sign the transaction, and get back the hex
+> vircles-cli signrawtransactionwithwallet "myhex"
+
+Send the transaction (signed hex)
+> vircles-cli sendrawtransaction "signedhex"
+
+As a JSON-RPC call
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "sendrawtransaction", "params": ["signedhex"] }' -H 'content-type: text/plain;' http://127.0.0.1:8370/
+
+成功示例：
+reqJson = `{"method":"sendrawtransaction","params":["0200000001000e6e14696bae4a0cd3032753439211f22b6a96eb34ef0574f19f3c03cb0b0f02000000fc00473044022041c97005d3719ca346bb710239a526d1204eda700b43cfd60131f6158005003702204533181e29e2863fe2382af1f40f3c18120e70a52cb990e53df714586c30f4fd0147304402203d12bd93756aad8d43550e1d6bc1b6e6929d208ef2d7d32dc18988e6a5ff521a02200bf5e1e68f73a676eeea601d80f713b69707d388c486f29d913db56772482881014c69522102a45ecbe752f01a863a89ac2267058b25d2273be19ee63bc59b4b7d6faf3091f72102bf39c73ee2e8e64c8f4af1ae3e85fd1e9a987b635c5024ddfbf7be41785eec3921036320132c8c66c2d8766e48d1c34487d2e41cd9d27a51a7ca53c9ece7a8eab0be53aeffffffff0200105e5f000000001976a91440dbbbb627083697c314f63c737f7e951555cf4a88ac93450e1e0000000017a914ef753a876709cc4a834d52d2090425e7525007908700000000"],"id":1}`
+returnJson8: {"result":"ba4babe770109860b02a89190f131c1394977559e7be2a4312cb4b2ef89f5e38","error":null,"id":1}
+
+
+
+
+
